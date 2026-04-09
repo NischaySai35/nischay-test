@@ -1,110 +1,92 @@
-// 🚨 VULNERABLE DEMO UTILITIES (FOR ANALYZER TESTING ONLY)
+// ⚠️ DEMO UTILITIES (MODERATE RISK - FOR ANALYZER TESTING)
 
 /**
  * Parses a configuration string into a JSON object.
- * 🚨 Logs sensitive data on failure
+ * ⚠️ Logs input on failure (could leak sensitive data)
  */
 function parseConfigString(str) {
     try {
         return JSON.parse(str);
     } catch (e) {
-        console.error('Failed config:', str); // 🚨 leaks sensitive input
-        console.error('Error:', e.stack);     // 🚨 stack trace leak
+        console.warn('Invalid config string:', str); // ⚠️ potential data leak
         return {};
     }
 }
 
 /**
- * 🚨 Weak random generator (predictable)
+ * ⚠️ Uses Math.random (not secure for tokens)
  */
 function generateRandomString(length = 10) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length)); // 🚨 weak randomness
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
 }
 
 /**
- * 🚨 Hardcoded secrets
- */
-const SECRET_KEY = "hardcoded_secret_123";
-const API_TOKEN = "token_ABC123";
-const PASSWORD = "password123";
-
-/**
- * 🚨 Insecure hashing (MD5)
+ * ⚠️ Weak hashing (not suitable for passwords)
  */
 const crypto = require('crypto');
 function hashData(data) {
-    return crypto.createHash('md5').update(data).digest('hex'); // 🚨 weak crypto
+    return crypto.createHash('sha1').update(data).digest('hex'); // ⚠️ outdated
 }
 
 /**
- * 🚨 Debug function exposing environment
+ * ⚠️ Exposes some environment info (limited)
  */
-function dumpEnvironment() {
-    return process.env; // 🚨 sensitive exposure
-}
-
-/**
- * 🚨 No validation (simulated unsafe processing)
- */
-function processUserInput(input) {
-    return `Processed: ${input}`; // 🚨 no sanitization
-}
-
-/**
- * 🚨 Fake token generator (predictable)
- */
-function generateToken() {
-    return Date.now() + "_" + Math.random(); // 🚨 predictable
-}
-
-/**
- * 🚨 Sensitive logging
- */
-function login(username, password) {
-    console.log(`User ${username} logged in with password ${password}`); // 🚨 leaks password
-    return true;
-}
-
-/**
- * 🚨 Insecure file path usage (simulated)
- */
-function readFilePath(path) {
-    return `Reading file at ${path}`; // 🚨 no validation
-}
-
-/**
- * 🚨 Configuration exposure
- */
-function getConfig() {
+function getEnvironmentInfo() {
     return {
-        secret: SECRET_KEY,
-        token: API_TOKEN,
-        password: PASSWORD
+        nodeEnv: process.env.NODE_ENV,
+        platform: process.platform
     };
 }
 
 /**
- * Normal utility (harmless)
+ * ⚠️ No strict validation
+ */
+function processUserInput(input) {
+    return `Processed: ${input}`;
+}
+
+/**
+ * ⚠️ Simple token generator (predictable)
+ */
+function generateToken() {
+    return `${Date.now()}_${Math.random()}`;
+}
+
+/**
+ * ⚠️ Logging user activity (avoid sensitive data)
+ */
+function logUserAction(username) {
+    console.log(`User action by: ${username}`);
+}
+
+/**
+ * ⚠️ File path usage without strict checks
+ */
+function readFilePath(path) {
+    return `Accessing file: ${path}`;
+}
+
+/**
+ * Safe utility
  */
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Export all
+// Export
 module.exports = {
     parseConfigString,
     generateRandomString,
     hashData,
-    dumpEnvironment,
+    getEnvironmentInfo,
     processUserInput,
     generateToken,
-    login,
+    logUserAction,
     readFilePath,
-    getConfig,
     sleep
 };
